@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Restaurant POS</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  </head>
+  <body class="bg-slate-100 text-slate-800">
+    <!-- Mobile top bar -->
+    <div
+      class="md:hidden flex items-center justify-between p-3 bg-white border-b"
+    >
+      <button class="text-2xl px-2" aria-label="Menu">☰</button>
+      <h1 class="text-lg font-bold">Restaurant POS</h1>
+      <button class="text-2xl px-2" aria-label="User">👤</button>
+    </div>
+
+    <div class="flex h-[calc(100vh-57px)] md:h-screen">
+      <!-- LEFT: categories -->
+      <aside
+        class="hidden md:flex flex-col md:w-40 lg:w-48 bg-white border-r p-3"
+      >
+        <input
+          class="search w-full rounded-lg p-2 outline outline-1 outline-slate-200 my-3"
+          type="text"
+          placeholder="Search..."
+        />
+        <div id="cats" class="flex flex-col gap-1"></div>
+        <button
+          id="modeBtn"
+          class="w-full text-left bg-blue-600 text-white rounded-lg p-2 mt-auto"
+        >
+          Dine In
+        </button>
+      </aside>
+
+      <!-- MIDDLE: menu -->
+      <main class="flex-1 overflow-auto p-3 relative">
+        <div class="md:hidden">
+          <input
+            class="search w-full rounded-lg p-2 outline outline-1 outline-slate-200 my-2"
+            type="text"
+            placeholder="Search..."
+          />
+          <div id="catsMobile" class="flex gap-2 mb-3 overflow-x-auto"></div>
+        </div>
+
+        <div
+          id="menu"
+          class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 w-full max-w-5xl mx-auto"
+        ></div>
+        <p id="empty" class="hidden text-center text-slate-500 mt-10">
+          No items match your search.
+        </p>
+
+        <button
+          id="viewOrder"
+          class="md:hidden w-full mt-5 bg-blue-600 text-white rounded-lg py-3 px-4 hover:bg-blue-700"
+        >
+          View Order · <span id="mobileTotal">0 Dh</span>
+        </button>
+      </main>
+
+      <!-- RIGHT: order panel (full screen on mobile when opened) -->
+      <section
+        id="orderPanel"
+        class="hidden md:flex flex-col md:w-72 lg:w-96 bg-white border-l"
+      >
+        <div class="flex items-center justify-between p-3 border-b">
+          <div class="flex items-center gap-2">
+            <button id="closeOrder" class="md:hidden px-2 py-1 rounded border">
+              ←
+            </button>
+            <span
+              class="bg-blue-600 text-white text-sm font-bold rounded-lg px-3 py-1"
+              >Table 12</span
+            >
+          </div>
+          <button id="clearBtn" class="text-sm text-red-600 hover:underline">
+            Clear
+          </button>
+        </div>
+
+        <div class="p-3 border-b space-y-2">
+          <div class="flex items-center gap-2">
+            <span class="w-14 text-sm text-slate-500">Guest:</span>
+            <div id="guestSel" class="flex flex-1 gap-1"></div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-14 text-sm text-slate-500">Course:</span>
+            <div id="courseSel" class="flex flex-1 gap-1"></div>
+          </div>
+        </div>
+
+        <div id="order" class="flex-1 overflow-auto p-3"></div>
+
+        <div class="border-t p-3">
+          <div
+            id="discountRow"
+            class="hidden flex justify-between text-sm text-slate-500"
+          >
+            <span id="discountLabel"></span><span id="discountAmt"></span>
+          </div>
+          <div class="flex items-end justify-between mb-3">
+            <span class="text-xl font-bold">Total</span>
+            <span id="total" class="text-2xl font-bold">0 Dh</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button
+              id="addGuestBtn"
+              class="flex-1 rounded-lg border py-2"
+              title="Add guest"
+            >
+              👤+
+            </button>
+            <button
+              id="discountBtn"
+              class="flex-1 rounded-lg border py-2 font-bold"
+              title="Discount"
+            >
+              %
+            </button>
+            <button
+              id="noteBtn"
+              class="flex-1 rounded-lg border py-2"
+              title="Note"
+            >
+              ✎
+            </button>
+            <button
+              id="payBtn"
+              class="flex-[2] rounded-lg bg-green-500 hover:bg-green-600 text-white py-2 font-bold"
+            >
+              $ Pay
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      /* ---------- DATA ---------- */
+      const MENU = [
+        { id: 1, name: "Burrata & tomatoes", price: 48, cat: "Starters" },
+        { id: 2, name: "Caesar salad", price: 42, cat: "Starters" },
+        { id: 3, name: "Beef carpaccio", price: 58, cat: "Starters" },
+        { id: 4, name: "Grilled seabass", price: 96, cat: "Main courses" },
+        { id: 5, name: "Beef tenderloin", price: 138, cat: "Main courses" },
+        { id: 6, name: "Chicken supreme", price: 78, cat: "Main courses" },
+        { id: 7, name: "Mushroom risotto", price: 72, cat: "Main courses" },
+        { id: 8, name: "Seafood linguine", price: 88, cat: "Main courses" },
+        { id: 9, name: "French fries", price: 24, cat: "Sides" },
+        { id: 10, name: "Roasted vegetables", price: 28, cat: "Sides" },
+        { id: 11, name: "Chocolate fondant", price: 38, cat: "Desserts" },
+        { id: 12, name: "Tiramisu", price: 36, cat: "Desserts" },
+        { id: 13, name: "Espresso", price: 16, cat: "Drinks" },
+        { id: 14, name: "Flat white", price: 22, cat: "Drinks" },
+        { id: 15, name: "Fresh orange juice", price: 28, cat: "Drinks" },
+      ];
+      const CATS = [
+        "All Items",
+        "Starters",
+        "Main courses",
+        "Sides",
+        "Desserts",
+        "Drinks",
+      ];
+      const COLORS = {
+        Starters: "bg-emerald-100",
+        "Main courses": "bg-blue-100",
+        Sides: "bg-amber-100",
+        Desserts: "bg-purple-100",
+        Drinks: "bg-sky-100",
+      };
+      const MODES = ["Dine In", "Takeaway", "Delivery"];
+      const COURSES = [1, 2, 3, 4];
+
+      /* ---------- STATE ---------- */
+      const saved = (() => {
+        try {
+          return JSON.parse(localStorage.getItem("pos-v1"));
+        } catch {
+          return null;
+        }
+      })();
+      const state = Object.assign(
+        {
+          cat: "All Items",
+          q: "",
+          guest: 1,
+          course: 1,
+          guests: [1, 2],
+          order: [], // { id, name, price, qty, guest, course, note }
+          fired: {}, // "guest-course" -> timestamp
+          discount: 0,
+          mode: "Dine In",
+        },
+        saved || {},
+      );
+      state.q = ""; // never restore search text
+
+      const $ = (s) => document.querySelector(s);
+      const $$ = (s) => document.querySelectorAll(s);
+      const money = (n) => `${Math.round(n * 100) / 100} Dh`;
+      const save = () => {
+        try {
+          localStorage.setItem("pos-v1", JSON.stringify(state));
+        } catch {}
+      };
+
+      /* ---------- MENU ---------- */
+      function renderCats() {
+        const cls = (c) =>
+          c === state.cat
+            ? "bg-blue-600 text-white"
+            : "bg-slate-100 hover:bg-slate-200";
+        $("#cats").innerHTML = CATS.map(
+          (c) =>
+            `<button data-cat="${c}" class="w-full text-left rounded-lg p-2 ${cls(c)}">${c}</button>`,
+        ).join("");
+        $("#catsMobile").innerHTML = CATS.map(
+          (c) =>
+            `<button data-cat="${c}" class="whitespace-nowrap rounded-lg py-2 px-4 ${cls(c)}">${c}</button>`,
+        ).join("");
+      }
+
+      function renderMenu() {
+        const items = MENU.filter(
+          (i) =>
+            (state.cat === "All Items" || i.cat === state.cat) &&
+            i.name.toLowerCase().includes(state.q),
+        );
+        $("#menu").innerHTML = items
+          .map(
+            (i) => `
+    <button data-id="${i.id}" class="flex min-h-[74px] flex-col justify-between rounded-xl ${COLORS[i.cat]} p-3 text-left transition active:scale-95 hover:brightness-95">
+      <h3 class="font-bold leading-tight">${i.name}</h3>
+      <p class="w-full text-right text-xs text-slate-600">${i.price} Dh</p>
+    </button>`,
+          )
+          .join("");
+        $("#empty").classList.toggle("hidden", items.length > 0);
+      }
+
+      /* ---------- SELECTORS ---------- */
+      function renderSelectors() {
+        const on = "bg-blue-600 text-white",
+          off = "bg-slate-100 hover:bg-slate-200";
+        $("#guestSel").innerHTML = state.guests
+          .map(
+            (g) =>
+              `<button data-guest="${g}" class="flex-1 rounded-lg py-2 font-bold ${g === state.guest ? on : off}">${g}</button>`,
+          )
+          .join("");
+        $("#courseSel").innerHTML = COURSES.map(
+          (c) =>
+            `<button data-course="${c}" class="flex-1 rounded-lg py-2 font-bold ${c === state.course ? "bg-green-500 text-white" : off}">${c}</button>`,
+        ).join("");
+      }
+
+      /* ---------- ORDER ---------- */
+      const lineKey = (l) => `${l.id}-${l.guest}-${l.course}`;
+
+      function minutesSince(ts) {
+        return Math.max(0, Math.floor((Date.now() - ts) / 60000));
+      }
+
+      function renderOrder() {
+        const o = state.order;
+        if (!o.length) {
+          $("#order").innerHTML =
+            `<p class="text-center text-slate-400 mt-10">No items yet.<br>Tap a dish to add it.</p>`;
+        } else {
+          const guests = [...new Set(o.map((l) => l.guest))].sort(
+            (a, b) => a - b,
+          );
+          $("#order").innerHTML = guests
+            .map((g) => {
+              const lines = o.filter((l) => l.guest === g);
+              const courses = [...new Set(lines.map((l) => l.course))].sort(
+                (a, b) => a - b,
+              );
+              return `
+        <div class="mb-4">
+          <h3 class="font-bold ${g === state.guest ? "text-blue-700" : ""} mb-1">GUEST ${g}</h3>
+          ${courses
+            .map((c) => {
+              const ts = state.fired[`${g}-${c}`];
+              const courseLines = lines.filter((l) => l.course === c);
+              return `
+              <div class="flex items-center justify-between mt-2 mb-1">
+                <span class="text-xs font-semibold text-slate-500">COURSE ${c}</span>
+                ${
+                  ts
+                    ? `<span class="text-xs font-bold rounded px-2 py-0.5 bg-orange-100 text-orange-700">FIRED · ${minutesSince(ts)}m</span>`
+                    : `<button data-fire="${g}-${c}" class="text-xs font-bold rounded px-2 py-0.5 bg-orange-400 text-white hover:bg-orange-500">FIRE</button>`
+                }
+              </div>
+              ${courseLines
+                .map(
+                  (l) => `
+                <div class="rounded-lg p-2 mb-1 border-l-4 ${ts ? "border-orange-400 bg-orange-50" : "border-blue-500 bg-slate-50"}">
+                  <div class="flex items-center gap-2">
+                    <button data-act="dec" data-key="${lineKey(l)}" class="w-7 h-7 rounded border bg-white">−</button>
+                    <b class="w-6 text-center">${l.qty}</b>
+                    <button data-act="inc" data-key="${lineKey(l)}" class="w-7 h-7 rounded border bg-white">+</button>
+                    <span class="flex-1 text-sm font-medium">${l.name}</span>
+                    <span class="text-sm">${money(l.qty * l.price)}</span>
+                  </div>
+                  ${l.note ? `<p class="text-xs text-slate-500 mt-1 ml-1">📝 ${l.note.replace(/</g, "&lt;")}</p>` : ""}
+                </div>`,
+                )
+                .join("")}`;
+            })
+            .join("")}
+        </div>`;
+            })
+            .join("");
+        }
+
+        const sub = o.reduce((s, l) => s + l.qty * l.price, 0);
+        const disc = (sub * state.discount) / 100;
+        $("#discountRow").classList.toggle("hidden", !state.discount);
+        $("#discountLabel").textContent = `Discount ${state.discount}%`;
+        $("#discountAmt").textContent = `− ${money(disc)}`;
+        $("#total").textContent = money(sub - disc);
+        $("#mobileTotal").textContent = money(sub - disc);
+        save();
+      }
+
+      function addItem(id) {
+        const item = MENU.find((i) => i.id === id);
+        const line = state.order.find(
+          (l) =>
+            l.id === id && l.guest === state.guest && l.course === state.course,
+        );
+        if (line) line.qty++;
+        else
+          state.order.push({
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            qty: 1,
+            guest: state.guest,
+            course: state.course,
+            note: "",
+          });
+        renderOrder();
+      }
+
+      function changeQty(key, delta) {
+        const line = state.order.find((l) => lineKey(l) === key);
+        if (!line) return;
+        line.qty += delta;
+        if (line.qty <= 0) state.order = state.order.filter((l) => l !== line);
+        renderOrder();
+      }
+
+      /* ---------- EVENTS ---------- */
+      // category buttons (desktop + mobile)
+      document.addEventListener("click", (e) => {
+        const cat = e.target.closest("[data-cat]");
+        if (cat) {
+          state.cat = cat.dataset.cat;
+          renderCats();
+          renderMenu();
+        }
+      });
+
+      // search (both inputs stay in sync)
+      $$(".search").forEach((inp) =>
+        inp.addEventListener("input", (e) => {
+          state.q = e.target.value.toLowerCase().trim();
+          $$(".search").forEach((o) => {
+            if (o !== e.target) o.value = e.target.value;
+          });
+          renderMenu();
+        }),
+      );
+
+      // add item
+      $("#menu").addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-id]");
+        if (btn) addItem(+btn.dataset.id);
+      });
+
+      // guest + course selection
+      $("#guestSel").addEventListener("click", (e) => {
+        const b = e.target.closest("[data-guest]");
+        if (b) {
+          state.guest = +b.dataset.guest;
+          renderSelectors();
+          renderOrder();
+        }
+      });
+      $("#courseSel").addEventListener("click", (e) => {
+        const b = e.target.closest("[data-course]");
+        if (b) {
+          state.course = +b.dataset.course;
+          renderSelectors();
+        }
+      });
+
+      // order lines: qty buttons + fire
+      $("#order").addEventListener("click", (e) => {
+        const act = e.target.closest("[data-act]");
+        if (act)
+          return changeQty(act.dataset.key, act.dataset.act === "inc" ? 1 : -1);
+        const fire = e.target.closest("[data-fire]");
+        if (fire) {
+          state.fired[fire.dataset.fire] = Date.now();
+          renderOrder();
+        }
+      });
+
+      // add guest
+      $("#addGuestBtn").onclick = () => {
+        const next = Math.max(...state.guests) + 1;
+        state.guests.push(next);
+        state.guest = next;
+        renderSelectors();
+        renderOrder();
+      };
+
+      // discount
+      $("#discountBtn").onclick = () => {
+        const v = prompt("Discount percent (0–100):", state.discount);
+        if (v === null) return;
+        const n = parseFloat(v);
+        state.discount = isNaN(n) ? 0 : Math.min(100, Math.max(0, n));
+        renderOrder();
+      };
+
+      // note on the last line added for the current guest
+      $("#noteBtn").onclick = () => {
+        const mine = state.order.filter((l) => l.guest === state.guest);
+        const line = mine[mine.length - 1];
+        if (!line) return alert("Add an item for this guest first.");
+        const v = prompt(`Note for ${line.name}:`, line.note || "");
+        if (v !== null) {
+          line.note = v.trim();
+          renderOrder();
+        }
+      };
+
+      // clear + pay
+      function resetOrder() {
+        state.order = [];
+        state.fired = {};
+        state.discount = 0;
+        state.guests = [1, 2];
+        state.guest = 1;
+        state.course = 1;
+        renderSelectors();
+        renderOrder();
+      }
+      $("#clearBtn").onclick = () => {
+        if (state.order.length && confirm("Clear the whole order?"))
+          resetOrder();
+      };
+      $("#payBtn").onclick = () => {
+        if (!state.order.length) return alert("The order is empty.");
+        if (confirm(`Charge ${$("#total").textContent}?`)) {
+          alert("Payment complete. Table 12 is now free.");
+          resetOrder();
+          closePanel();
+        }
+      };
+
+      // order type (Dine In / Takeaway / Delivery)
+      $("#modeBtn").onclick = () => {
+        state.mode = MODES[(MODES.indexOf(state.mode) + 1) % MODES.length];
+        $("#modeBtn").textContent = state.mode;
+        save();
+      };
+
+      // mobile: open / close order panel
+      const panel = $("#orderPanel");
+      function openPanel() {
+        panel.classList.remove("hidden");
+        panel.classList.add("fixed", "inset-0", "z-10", "w-full", "flex");
+      }
+      function closePanel() {
+        panel.classList.add("hidden");
+        panel.classList.remove("fixed", "inset-0", "z-10", "w-full");
+      }
+      $("#viewOrder").onclick = openPanel;
+      $("#closeOrder").onclick = closePanel;
+      window.addEventListener("resize", () => {
+        if (innerWidth >= 768) closePanel();
+      });
+
+      /* ---------- START ---------- */
+      $("#modeBtn").textContent = state.mode;
+      renderCats();
+      renderMenu();
+      renderSelectors();
+      renderOrder();
+      setInterval(() => {
+        if (Object.keys(state.fired).length) renderOrder();
+      }, 30000); // refresh fire timers
+    </script>
+  </body>
+</html>
