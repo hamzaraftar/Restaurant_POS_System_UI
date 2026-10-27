@@ -1,0 +1,258 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>POS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </head>
+  <body class="bg-slate-100">
+    <div
+      class="md:hidden flex items-center justify-between p-3 bg-white border-b"
+    >
+      <h1>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="lucide lucide-menu preview-icon"
+        >
+          <path d="M4 5h16" />
+          <path d="M4 12h16" />
+          <path d="M4 19h16" />
+        </svg>
+      </h1>
+      <h1 class="text-lg font-bold">Restaurant POS</h1>
+      <h1>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="lucide lucide-user-round preview-icon"
+        >
+          <circle cx="12" cy="8" r="5" />
+          <path d="M20 21a8 8 0 0 0-16 0" />
+        </svg>
+      </h1>
+    </div>
+
+    <div class="flex h-screen">
+      <!-- left -->
+
+      <aside
+        class="hidden md:flex flex-col md:w-40 lg:w-48 bg-white border-r p-3"
+      >
+        <input
+          type="text"
+          placeholder="Search..."
+          class="w-full rounded-lg p-2 outline outline-1 outline-slate-200 mt-3 mb-3 rounded-lg"
+        />
+
+        <button class="w-full text-left bg-blue-600 text-white rounded-lg p-2">
+          All Items
+        </button>
+
+        <div class="flex flex-col gap-2 mt-3">
+          <button class="w-full text-left p-2">Starters</button>
+          <button class="w-full text-left p-2">Main courses</button>
+          <button class="w-full text-left p-2">Sides</button>
+          <button class="w-full text-left p-2">Desserts</button>
+          <button class="w-full text-left p-2">Drinks</button>
+        </div>
+
+        <button
+          class="w-full text-left bg-blue-600 text-white rounded-lg p-2 mt-auto"
+        >
+          Dine In
+        </button>
+      </aside>
+
+      <!--middle -->
+
+      <main class="flex-1 overflow-auto p-3">
+        <input
+          type="text"
+          placeholder="Search..."
+          class="w-full mx-auto rounded-lg p-2 outline outline-1 outline-slate-200 mt-3 mb-3 rounded-lg md:hidden"
+        />
+        <div class="flex gap-2 mb-3 overflow-auto md:hidden m-4">
+          <button
+            class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700"
+          >
+            All Items
+          </button>
+          <button
+            class="bg-gray-200 text-black py-2 px-4 rounded-lg hover:bg-blue-700"
+          >
+            Starters
+          </button>
+          <button
+            class="bg-gray-200 text-black py-2 px-4 rounded-lg hover:bg-blue-700"
+          >
+            Main courses
+          </button>
+          <button
+            class="bg-gray-200 text-black py-2 px-4 rounded-lg hover:bg-blue-700"
+          >
+            Drinks
+          </button>
+        </div>
+
+
+        <div
+          class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 w-full max-w-5xl mx-auto"
+        >
+          <div
+            class="flex min-h-[74px] flex-col justify-between rounded-xl bg-emerald-100 p-3"
+          >
+            <h3 class="font-bold leading-tight text-slate-800">
+              Burrata & tomatoes
+            </h3>
+            <p class="text-right text-xs font-normal text-slate-600">48 Dh</p>
+          </div>
+
+          <div
+            class="flex min-h-[74px] flex-col justify-between rounded-xl bg-blue-100 p-3"
+          >
+            <h3 class="font-bold leading-tight text-slate-800">Caesar salad</h3>
+            <p class="text-right text-xs font-normal text-slate-600">42 Dh</p>
+          </div>
+
+          <div
+            class="flex min-h-[74px] flex-col justify-between rounded-xl bg-emerald-100 p-3"
+          >
+            <h3 class="font-bold leading-tight text-slate-800">
+              Beef carpaccio
+            </h3>
+            <p class="text-right text-xs font-normal text-slate-600">58 Dh</p>
+          </div>
+
+          <div
+            class="flex min-h-[74px] flex-col justify-between rounded-xl bg-blue-100 p-3"
+          >
+            <h3 class="font-bold leading-tight text-slate-800">
+              Grilled seabass
+            </h3>
+            <p class="text-right text-xs font-normal text-slate-600">96 Dh</p>
+          </div>
+
+          <div
+            class="flex min-h-[74px] flex-col justify-between rounded-xl bg-blue-100 p-3"
+          >
+            <h3 class="font-bold leading-tight text-slate-800">
+              Beef tenderloin
+            </h3>
+            <p class="text-right text-xs font-normal text-slate-600">138 Dh</p>
+          </div>
+
+          <div
+            class="flex min-h-[74px] flex-col justify-between rounded-xl bg-blue-100 p-3"
+          >
+            <h3 class="font-bold leading-tight text-slate-800">
+              Chicken supreme
+            </h3>
+            <p class="text-right text-xs font-normal text-slate-600">78 Dh</p>
+          </div>
+
+          <div
+            class="flex min-h-[74px] flex-col justify-between rounded-xl bg-blue-100 p-3"
+          >
+            <h3 class="font-bold leading-tight text-slate-800">
+              Mushroom risotto
+            </h3>
+            <p class="text-right text-xs font-normal text-slate-600">72 Dh</p>
+          </div>
+
+          <div
+            class="flex min-h-[74px] flex-col justify-between rounded-xl bg-blue-100 p-3"
+          >
+            <h3 class="font-bold leading-tight text-slate-800">
+              Seafood linguine
+            </h3>
+            <p class="text-right text-xs font-normal text-slate-600">88 Dh</p>
+          </div>
+
+          <div
+            class="flex min-h-[74px] flex-col  justify-center rounded-xl bg-amber-100 p-3"
+          >
+            <h3 class="font-bold leading-tight text-slate-800">French fries</h3>
+            <p class="text-right text-xs font-normal text-slate-600">24 Dh</p>
+          </div>
+
+          <div
+            class="flex min-h-[74px] flex-col justify-between rounded-xl bg-amber-100 p-3"
+          >
+            <h3 class="font-bold leading-tight text-slate-800">
+              Roasted vegetables
+            </h3>
+            <p class="text-right text-xs font-normal text-slate-600">28 Dh</p>
+          </div>
+
+          <div
+            class="flex min-h-[74px] flex-col justify-between rounded-xl bg-purple-100 p-3"
+          >
+            <h3 class="font-bold leading-tight text-slate-800">
+              Chocolate fondant
+            </h3>
+            <p class="text-right text-xs font-normal text-slate-600">38 Dh</p>
+          </div>
+
+          <div
+            class="flex min-h-[74px] flex-col justify-between rounded-xl bg-purple-100 p-3"
+          >
+            <h3 class="font-bold leading-tight text-slate-800">Tiramisu</h3>
+            <p class="text-right text-xs font-normal text-slate-600">36 Dh</p>
+          </div>
+
+          <div
+            class="flex min-h-[74px] flex-col justify-between rounded-xl bg-blue-100 p-3"
+          >
+            <h3 class="font-bold leading-tight text-slate-800">Espresso</h3>
+            <p class="text-right text-xs font-normal text-slate-600">16 Dh</p>
+          </div>
+
+          <div
+            class="flex min-h-[74px] flex-col justify-between rounded-xl bg-blue-100 p-3"
+          >
+            <h3 class="font-bold leading-tight text-slate-800">Flat white</h3>
+            <p class="text-right text-xs font-normal text-slate-600">22 Dh</p>
+          </div>
+
+          <div
+            class="flex min-h-[74px] flex-col justify-between rounded-xl bg-blue-100 p-3"
+          >
+            <h3 class="font-bold leading-tight text-slate-800">
+              Fresh orange juice
+            </h3>
+            <p class="text-right text-xs font-normal text-slate-600">28 Dh</p>
+          </div>
+        </div>
+        <button
+          class="w-full md:hidden mt-5 bg-blue-600 text-white rounded-lg p-2 text-white py-2 px-4 rounded-lg hover:bg-blue-700"
+        >
+          View Order
+        </button>
+      </main>
+
+      <!-- right -->
+      <section class="hidden md:block md:w-64 lg:w-96 bg-white border-l p-3">
+        <h2 class="font-bold">Table 12</h2>
+        <p class="mt-4">1x Burrata ... 48 Dh</p>
+        <p class="font-bold mt-6">Total 48 Dh</p>
+      </section>
+    </div>
+  </body>
+</html>
